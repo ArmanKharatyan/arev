@@ -23,6 +23,7 @@ PLANTS_WEATHER_FILE = PROCESSED / f"plants_weather_{YEAR}.csv"
 LAND_COVER_FILE = PROCESSED / "plants_land_cover.csv"
 AG_WEATHER_CACHE = PROCESSED / "nasa_ag_cells.csv"
 LOSS_MODEL_FILE = RESULTS / "loss_model.joblib"
+AG_MODEL_FILE = RESULTS / "ag_model.joblib"
 
 LOSS_FEATURES = [
     "ALLSKY_KT", "ALLSKY_SRF_ALB", "AOD_55", "CLOUD_AMT", "T2M", "T2M_MAX",
@@ -35,8 +36,14 @@ AG_FEATURES = [
     "WS2M", "ALLSKY_SFC_SW_DWN", "GWETROOT", "GWETTOP",
 ]
 
+# economic assumptions: editable starting values, not quotes
 USD_AMD = 390                    # exchange rate for AMD prices
 HA_PER_MW = 2.5                  # land needed per MW of fixed-tilt PV
+TILT_GAIN = 1.13                 # sunlight on optimally tilted fixed panels vs. flat ground
+CAPEX_USD_KW = 750               # construction cost
+OM_USD_KW_YR = 12                # running cost
+TARIFF_USD_KWH = 0.06            # electricity sale price
+WHEAT_PRICE_USD_T = 280          # farm-gate wheat price
 
 SITES = {                        # candidate sites in Armenia
     "Yerevan": (40.18, 44.51),

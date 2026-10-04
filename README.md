@@ -39,9 +39,34 @@ python scripts/05_predict_sites.py      # predict for the Armenian sites in arev
 python scripts/06_site_climate.py       # PVGIS climate summary for the same sites
 NASS_KEY=<your key> python scripts/07_train_ag_model.py   # agricultural potential (Windows: set NASS_KEY=... first)
 python scripts/08_estimate_land_price.py # land price per site and land cost of a plant
+python scripts/09_assess_sites.py       # full assessment for any coordinates (see below)
 ```
 
 Candidate sites, year, feature lists and file locations are all in `arev/config.py`.
+
+## Assess any site
+
+After steps 01-07 have run once (they train and save the two models), only step 09 is needed. Edit the coordinates at the top of `scripts/09_assess_sites.py`:
+
+```python
+SITES = {
+    "Mets Masrik": (40.21, 45.76),
+    "Sisian": (39.52, 46.03),
+}
+CAPACITY_MW = 1
+```
+
+and run `python scripts/09_assess_sites.py`. For each site it reports:
+
+| Group | Values |
+|---|---|
+| Solar output | Sunlight per year, ideal output, predicted output, energy lost and loss % |
+| Solar money | Revenue and profit per year from selling the electricity |
+| Farming alternative | Predicted wheat yield and farm revenue from the same land, and how many times more solar earns |
+| Costs | Land price (USD and AMD per m², with a range), land cost, construction cost, total investment, payback years |
+| Reliability | Features outside what each model was trained on; treat those predictions as rough |
+
+Economic assumptions (construction cost, electricity price, wheat price, land per MW, exchange rate) are in `arev/config.py`. They are starting values, not quotes.
 
 ## Outputs (`results/`)
 
@@ -53,6 +78,7 @@ Candidate sites, year, feature lists and file locations are all in `arev/config.
 | `site_predictions.csv` | Predicted energy per kW and per year for each site, and features outside the training range |
 | `site_climate_annual.csv`, `site_climate_monthly.csv` | PVGIS climate per site |
 | `ag_model_scores.csv`, `ag_model_sites.csv` | Agricultural model accuracy and predicted wheat yield per site |
+| `site_assessment.csv` | The full assessment from step 09 |
 | `land_price.csv` | Estimated land price per site (USD and AMD per m², low/high range) and land cost of a plant |
 
 ## How the loss model works
@@ -83,7 +109,7 @@ It is calibrated to list.am asking prices for agricultural plots: about $25/m² 
 ## Repository layout
 
 ```
-arev/          shared code: config, EIA readers, NASA POWER, PVGIS, land cover, land price
+arev/          shared code: config, EIA readers, NASA POWER, PVGIS, land cover, land price, site assessment
 scripts/       pipeline steps, run in numbered order
 data/          raw downloads and processed files (not committed)
 results/       model outputs (not committed)

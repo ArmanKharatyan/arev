@@ -5,6 +5,7 @@ Needs a free USDA NASS API key in the NASS_KEY environment variable.
 import os
 from functools import partial
 
+import joblib
 import pandas as pd
 import requests
 from sklearn.ensemble import HistGradientBoostingRegressor
@@ -56,6 +57,7 @@ predictions = {name: cross_val_predict(m, X, y, groups=data["state"], cv=GroupKF
 scores = pd.DataFrame({name: {"MAE": mean_absolute_error(y, p), "R2": r2_score(y, p)} for name, p in predictions.items()}).T
 scores.loc["baseline_median"] = [mean_absolute_error(y, [y.median()] * len(y)), 0.0]
 final = models["boosting"].fit(X, y)
+joblib.dump(final, c.AG_MODEL_FILE)
 
 # %% predict for the candidate sites
 sites = add_cells(pd.DataFrame(c.SITES, index=["Latitude", "Longitude"]).T.rename_axis("site").reset_index())
