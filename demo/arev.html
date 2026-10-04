@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arev: solar site assessment for Armenia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1D2B3A; --muted: #5C6B7A; --paper: #EEF2F4; --panel: #FFFFFF;
+  --sun: #E9A21B; --tuff: #A65A4E; --field: #557A35; --line: #CBD3D9;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #E6ECF0; --muted: #9AA8B4; --paper: #14202B; --panel: #1C2B38;
+    --sun: #F2B33D; --tuff: #D08576; --field: #8DB866; --line: #31424F;
+  }
+}
+:root[data-theme="dark"] {
+  --ink: #E6ECF0; --muted: #9AA8B4; --paper: #14202B; --panel: #1C2B38;
+  --sun: #F2B33D; --tuff: #D08576; --field: #8DB866; --line: #31424F;
+}
+*, *::before, *::after { box-sizing: inherit; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  font-size: 1.0625rem; line-height: 1.55;
+}
+main { max-width: 1080px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+h1, h2, h3 { line-height: 1.1; margin: 0; }
+p { max-width: 68ch; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+
+header { display: flex; align-items: baseline; gap: .75rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.brand { font-weight: 800; font-size: 1.5rem; letter-spacing: -.02em; }
+.brand span { color: var(--sun); }
+header p { margin: 0; color: var(--muted); }
+
+.hero { display: grid; grid-template-columns: 1.4fr 1fr; gap: 2rem; align-items: start; }
+.answer { font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 800; letter-spacing: -.03em; line-height: 1.02; }
+.answer .num { color: var(--sun); font-variant-numeric: tabular-nums; }
+.site { color: var(--muted); margin: .75rem 0 0; }
+.facts { display: flex; flex-wrap: wrap; gap: 1.5rem 2.5rem; margin-top: 2rem; }
+.fact b { display: block; font-size: 1.5rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.fact small { color: var(--muted); }
+
+form { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 1.25rem; }
+form h2 { font-size: 1.05rem; font-weight: 600; margin-bottom: .25rem; }
+form > p { margin: 0 0 1rem; color: var(--muted); font-size: .9rem; }
+label { display: grid; grid-template-columns: 1fr 7.5rem; align-items: center; gap: .5rem; padding: .35rem 0; font-size: .95rem; }
+input { width: 100%; font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: .35rem .5rem; text-align: right; font-variant-numeric: tabular-nums; }
+
+section { margin-top: 4rem; }
+section > h2 { font-size: 1.6rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: .5rem; }
+section > p { color: var(--muted); margin-top: 0; }
+
+.chart { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 1.25rem 1rem .75rem; overflow-x: auto; }
+.chart svg { display: block; min-width: 560px; width: 100%; height: auto; }
+.legend { display: flex; flex-wrap: wrap; gap: 1.25rem; font-size: .9rem; color: var(--muted); margin-top: .5rem; }
+.legend i { display: inline-block; width: .8rem; height: .8rem; border-radius: 2px; vertical-align: -1px; margin-right: .35rem; }
+
+.pillars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 3px solid var(--ink); }
+.pillar { padding: 1.25rem 1.25rem 1.25rem 0; }
+.pillar + .pillar { padding-left: 1.25rem; border-left: 1px solid var(--line); }
+.pillar h3 { font-size: 1.15rem; font-weight: 600; }
+.status { display: inline-block; font-size: .8rem; margin: .4rem 0 .6rem; padding: .1rem .5rem; border-radius: 99px; }
+.live { background: color-mix(in srgb, var(--field) 18%, transparent); color: var(--field); }
+.next { background: color-mix(in srgb, var(--tuff) 16%, transparent); color: var(--tuff); }
+.pillar p { font-size: .95rem; margin: 0; }
+.pillar .val { font-size: 1.35rem; font-weight: 600; display: block; margin-bottom: .35rem; font-variant-numeric: tabular-nums; }
+
+ol.flow { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; counter-reset: s; }
+ol.flow li { counter-increment: s; border-top: 1px solid var(--line); padding-top: .75rem; }
+ol.flow li::before { content: counter(s); font-weight: 800; font-size: 1.6rem; color: var(--sun); display: block; }
+ol.flow b { display: block; }
+ol.flow span { color: var(--muted); font-size: .95rem; }
+
+footer { margin-top: 4rem; padding-top: 1.25rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .88rem; }
+footer p { margin: .35rem 0; }
+
+@media (max-width: 820px) {
+  .hero { grid-template-columns: 1fr; }
+  .pillars, ol.flow { grid-template-columns: 1fr 1fr; }
+  .pillar:nth-child(3) { padding-left: 0; border-left: 0; }
+}
+@media (max-width: 520px) {
+  .pillars, ol.flow { grid-template-columns: 1fr; }
+  .pillar + .pillar { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); }
+}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="brand">Arev<span>.</span></div>
+    <p>Know what a solar site will give, and what it will cost, before you build it.</p>
+  </header>
+
+  <div class="hero">
+    <div>
+      <div class="answer" aria-live="polite">
+        <span class="num" id="cap-out">1 MW</span> near Yerevan makes
+        <span class="num" id="energy-out">–</span> a year and pays back in
+        <span class="num" id="payback-out">–</span>.
+      </div>
+      <p class="site">Site: Yerevan (40.18° N, 44.51° E). Climate from PVGIS typical meteorological year.</p>
+      <div class="facts">
+        <div class="fact"><b id="ghi-out">–</b><small>sunlight per year</small></div>
+        <div class="fact"><b id="yield-out">–</b><small>energy per kW installed</small></div>
+        <div class="fact"><b id="temp-out">–</b><small>lost to panel heat</small></div>
+        <div class="fact"><b id="lcoe-out">–</b><small>cost per kWh over 25 years</small></div>
+      </div>
+    </div>
+
+    <form id="inputs" onsubmit="return false">
+      <h2>Your project</h2>
+      <p>Change any number. Results update instantly.</p>
+      <label>Plant size (MW)<input type="number" id="cap" value="1" min="0.1" step="0.1"></label>
+      <label>Build cost ($/kW)<input type="number" id="capex" value="750" min="100" step="10"></label>
+      <label>Electricity price ($/kWh)<input type="number" id="tariff" value="0.06" min="0.01" step="0.005"></label>
+      <label>Running cost ($/kW/yr)<input type="number" id="om" value="12" min="0" step="1"></label>
+      <label>Land price ($/ha)<input type="number" id="land" value="3000" min="0" step="100"></label>
+      <label>Dust loss (%)<input type="number" id="soil" value="3" min="0" max="30" step="0.5"></label>
+    </form>
+  </div>
+
+  <section>
+    <h2>The year at this site</h2>
+    <p>Sunlight peaks in July, but so does heat, which cuts panel output. July to September are dry, so dust builds up with no rain to wash it off.</p>
+    <div class="chart"><svg id="chart" viewBox="0 0 720 260" role="img" aria-label="Monthly sunlight, panel heat loss and dry months in Yerevan"></svg></div>
+    <div class="legend">
+      <span><i style="background:var(--sun)"></i>Sunlight (kWh/m² per month)</span>
+      <span><i style="background:var(--tuff)"></i>Output lost to heat (%)</span>
+      <span><i style="background:color-mix(in srgb, var(--tuff) 22%, transparent)"></i>Dry months: dust risk</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Four questions for every site</h2>
+    <p>Most tools answer only the first. Arev answers all four, from coordinates alone.</p>
+    <div class="pillars">
+      <div class="pillar">
+        <h3>How much sun?</h3>
+        <span class="status live">Working</span>
+        <span class="val" id="p-climate">–</span>
+        <p>Sunlight, temperature, wind and humidity from PVGIS and NASA POWER for any point.</p>
+      </div>
+      <div class="pillar">
+        <h3>What will we lose?</h3>
+        <span class="status live">Working</span>
+        <span class="val" id="p-loss">–</span>
+        <p>Heat and dust losses. Our model learns them from 1,000 real US solar plants and their weather.</p>
+      </div>
+      <div class="pillar">
+        <h3>What happens to farming?</h3>
+        <span class="status next">Model trained, results next</span>
+        <span class="val">Wheat potential</span>
+        <p>Predicts crop yield of the land from climate, so plants go on poor land, not on the Ararat valley's best fields.</p>
+      </div>
+      <div class="pillar">
+        <h3>Does it pay?</h3>
+        <span class="status live">Working</span>
+        <span class="val" id="p-econ">–</span>
+        <p>Build, land and running costs against electricity sales. Payback and cost per kWh.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>How it works</h2>
+    <ol class="flow">
+      <li><b>Drop a pin</b><span>Any coordinates in Armenia.</span></li>
+      <li><b>Pull the data</b><span>Climate, land cover, soil and land value from free public APIs.</span></li>
+      <li><b>Predict</b><span>Physics gives clean-panel output; our models predict losses and farm value.</span></li>
+      <li><b>Decide</b><span>One page per site: energy, losses, farming impact, payback.</span></li>
+    </ol>
+  </section>
+
+  <footer>
+    <p>Climate data: PVGIS (EU Joint Research Centre) typical year for Yerevan. Training data: US EIA plant generation, NASA POWER.</p>
+    <p>Prices, costs and dust loss are editable starting assumptions, not quotes. Panel heat estimate: cell temperature from air temperature and sunlight, 0.4% output loss per °C above 25 °C. Yield assumes optimally tilted fixed panels (+13% sunlight vs. flat) and 10% equipment losses.</p>
+  </footer>
+</main>
+
+<script>
+// PVGIS TMY, Yerevan: monthly mean air temp (°C), relative humidity (%), 24-hour mean global horizontal irradiance (W/m²)
+const T  = [-0.18, -3.65, 2.65, 12.14, 15.68, 19.57, 24.20, 25.59, 19.03, 9.86, 6.71, -1.68];
+const RH = [73.8, 59.3, 68.2, 53.9, 55.1, 50.0, 42.0, 41.6, 44.5, 59.2, 66.2, 62.9];
+const G  = [71.4, 143.1, 159.8, 224.3, 262.6, 288.1, 312.6, 282.5, 231.1, 141.9, 104.1, 90.6];
+const DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const TILT_GAIN = 1.13, SYSTEM_LOSS = 0.10, TEMP_COEF = 0.004, HA_PER_MW = 2.5, RATE = 0.08, YEARS = 25;
+
+const ghiMonth = G.map((g, i) => g * 24 * DAYS[i] / 1000);                       // kWh/m² per month
+const heatLoss = G.map((g, i) => Math.max(0, TEMP_COEF * (T[i] + 0.03 * 2 * g - 25)));  // daytime irradiance ≈ 2 × 24h mean
+const dry = RH.map((rh, i) => rh < 50 && T[i] > 15);
+const ghiYear = ghiMonth.reduce((a, b) => a + b, 0);
+const tempLoss = ghiMonth.reduce((a, g, i) => a + g * heatLoss[i], 0) / ghiYear;
+
+const $ = id => document.getElementById(id);
+const fmt = (v, d = 0) => v.toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
+
+function update() {
+  const cap = +$("cap").value, capex = +$("capex").value, tariff = +$("tariff").value;
+  const om = +$("om").value, land = +$("land").value, soil = +$("soil").value / 100;
+
+  const specYield = ghiYear * TILT_GAIN * (1 - tempLoss) * (1 - soil) * (1 - SYSTEM_LOSS);  // kWh per kW per year
+  const energy = specYield * cap;                                                          // MWh per year
+  const invest = cap * 1000 * capex + cap * HA_PER_MW * land;
+  const yearly = energy * 1000 * tariff - cap * 1000 * om;
+  const crf = RATE * (1 + RATE) ** YEARS / ((1 + RATE) ** YEARS - 1);
+  const lcoe = (invest * crf + cap * 1000 * om) / (energy * 1000);
+  const payback = yearly > 0 ? invest / yearly : Infinity;
+
+  $("cap-out").textContent = fmt(cap, cap % 1 ? 1 : 0) + " MW";
+  $("energy-out").textContent = fmt(energy) + " MWh";
+  $("payback-out").textContent = isFinite(payback) ? fmt(payback, 1) + " years" : "never at this price";
+  $("ghi-out").textContent = fmt(ghiYear) + " kWh/m²";
+  $("yield-out").textContent = fmt(specYield) + " kWh";
+  $("temp-out").textContent = fmt(tempLoss * 100, 1) + "%";
+  $("lcoe-out").textContent = "$" + fmt(lcoe, 3);
+  $("p-climate").textContent = fmt(ghiYear) + " kWh/m²";
+  $("p-loss").textContent = fmt((tempLoss + soil) * 100, 1) + "% lost";
+  $("p-econ").textContent = isFinite(payback) ? fmt(payback, 1) + "-year payback" : "Not profitable";
+}
+
+function drawChart() {
+  const svg = $("chart"), W = 720, H = 260, L = 44, R = 44, TOP = 16, B = 30;
+  const bw = (W - L - R) / 12, maxG = Math.max(...ghiMonth) * 1.1, maxL = 0.12;
+  const y = v => TOP + (H - TOP - B) * (1 - v / maxG);
+  const yl = v => TOP + (H - TOP - B) * (1 - v / maxL);
+  let s = "";
+  dry.forEach((d, i) => { if (d) s += `<rect x="${L + i * bw}" y="${TOP}" width="${bw}" height="${H - TOP - B}" fill="var(--tuff)" opacity=".14"/>`; });
+  [0, 50, 100, 150, 200].forEach(v => {
+    s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/>`;
+    s += `<text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>`;
+  });
+  [0, 4, 8, 12].forEach(v => s += `<text x="${W - R + 8}" y="${yl(v / 100) + 4}" font-size="11" fill="var(--tuff)">${v}%</text>`);
+  ghiMonth.forEach((g, i) => {
+    s += `<rect x="${L + i * bw + bw * .18}" y="${y(g)}" width="${bw * .64}" height="${y(0) - y(g)}" rx="3" fill="var(--sun)"><title>${MONTHS[i]}: ${fmt(g)} kWh/m², ${fmt(heatLoss[i] * 100, 1)}% heat loss</title></rect>`;
+    s += `<text x="${L + i * bw + bw / 2}" y="${H - 10}" text-anchor="middle" font-size="12" fill="var(--muted)">${MONTHS[i]}</text>`;
+  });
+  const pts = heatLoss.map((l, i) => `${L + i * bw + bw / 2},${yl(l)}`).join(" ");
+  s += `<polyline points="${pts}" fill="none" stroke="var(--tuff)" stroke-width="2.5"/>`;
+  heatLoss.forEach((l, i) => s += `<circle cx="${L + i * bw + bw / 2}" cy="${yl(l)}" r="3.5" fill="var(--tuff)"/>`);
+  svg.innerHTML = s;
+}
+
+document.querySelectorAll("#inputs input").forEach(el => el.addEventListener("input", update));
+drawChart();
+update();
+</script>
+</body>
+</html>

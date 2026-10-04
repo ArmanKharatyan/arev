@@ -1,0 +1,14 @@
+# data and outputs are reproduced by the pipeline
+data/raw/*
+data/processed/*
+results/*
+!.gitkeep
+
+# python
+__pycache__/
+*.egg-info/
+.venv/
+.env
+
+# jupyter
+.ipynb_checkpoints/
