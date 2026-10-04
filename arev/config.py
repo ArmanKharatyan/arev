@@ -35,6 +35,9 @@ AG_FEATURES = [
     "WS2M", "ALLSKY_SFC_SW_DWN", "GWETROOT", "GWETTOP",
 ]
 
+USD_AMD = 390                    # exchange rate for AMD prices
+HA_PER_MW = 2.5                  # land needed per MW of fixed-tilt PV
+
 SITES = {                        # candidate sites in Armenia
     "Yerevan": (40.18, 44.51),
     "Gyumri": (40.79, 43.85),
